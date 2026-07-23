@@ -34,6 +34,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 		return SDL_APP_FAILURE;
 	}
 
+	// since we are not creating a new process, only a drawing surface, we need to use CreateWindowWithProperties
 	SDL_PropertiesID props = SDL_CreateProperties();
 	SDL_SetPointerProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, window);
 	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, GetSystemMetrics(SM_CXSCREEN));
@@ -42,11 +43,12 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 	SDL_Window* wallpaper_window = SDL_CreateWindowWithProperties(props);
 	SDL_DestroyProperties(props);
 	if(!wallpaper_window) {
-		SDL_Log("Can't grab window: %s", SDL_GetError());
+		SDL_Log("Can't create window: %s", SDL_GetError());
 		delete wpg;
 		return SDL_APP_FAILURE;
 	}
 
+	// CreateWindowWithProperties does not create renderer, so here it is
 	SDL_Renderer* renderer = SDL_CreateRenderer(wallpaper_window, NULL);
 	if (!renderer) {
 		SDL_Log("Can't create renderer: %s", SDL_GetError());
@@ -54,6 +56,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 		return SDL_APP_FAILURE;
 	}
 
+	// save data to appstate
 	AppState* state = (AppState*)SDL_malloc(sizeof(AppState));
 	state->renderer = renderer;
 	state->wallpaper = wpg;
@@ -72,7 +75,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
-	// pointer assist: appstate is cast into double pointer SDL_Renderer, and is being deref'ed to pointer to SDL_Renderer
 	SDL_Renderer* renderer = GetAppState(appstate)->renderer;
 
 	// converting from ms to s
@@ -92,15 +94,16 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result) {
 		AppState* state = GetAppState(appstate);
 		if (state->renderer) {
 			SDL_DestroyRenderer(state->renderer);
+			state->renderer = NULL;
 		}
 		if (state->window) {
 			SDL_DestroyWindow(state->window);
+			state->window = NULL;
 		}
-
-		WallpaperGetter wp = *(state->wallpaper);
-		wp.ReturnHandle();
-		delete& wp;
-		delete state->wallpaper;
+		if (state->wallpaper) {
+			state->wallpaper->ReturnHandle();
+			delete state->wallpaper;
+		}
 		SDL_free(appstate);
 	}
 	

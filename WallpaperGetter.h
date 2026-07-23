@@ -8,18 +8,18 @@
 class WallpaperGetter
 {
 private:
-	HWND AppWindow;
+	HWND WorkerW;
 
 public:
 	
 	/// <summary>
-	/// Does some black magic, do return the handler on app exit (<see cref="WallpaperGetter::ReturnHandle()"/>)
+	/// Gets handle of wallpaper process, do return the handler on app exit (<see cref="WallpaperGetter::ReturnHandle()"/>)
 	/// </summary>
 	/// <returns>handle for new wallpaper process</returns>
 	HWND GetHandle();
 	
 	/// <summary>
-	/// Destroys the window, returning default wallpaper back
+	/// Frees the process, and returns default wallpaper back
 	/// </summary>
 	void ReturnHandle();
 
@@ -27,6 +27,6 @@ public:
 	/// Checks if window was created okay
 	/// </summary>
 	/// <returns>true if window is created</returns>
-	bool IsValid() const { return AppWindow != NULL; }
+	bool IsValid() const { return WorkerW != NULL; }
 };
 

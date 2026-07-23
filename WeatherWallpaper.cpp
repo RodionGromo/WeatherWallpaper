@@ -14,8 +14,8 @@ typedef struct AppState {
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	WallpaperGetter* wallpaper;
-} AppState
-;
+} AppState;
+
 void* global_appstate;
 
 static AppState* GetAppState(void* appstate) {

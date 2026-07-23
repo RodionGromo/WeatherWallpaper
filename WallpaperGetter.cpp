@@ -23,28 +23,11 @@ static HWND FindWorkerW() {
 
 void WallpaperGetter::ReturnHandle()
 {
-    // do NOT ask me what the hell is this, I don't know either
-    // well I do know, it restores default wallpaper by reading it from registry
-	if (WorkerW) {
-        InvalidateRect(WorkerW, NULL, TRUE);
-        UpdateWindow(WorkerW);
-
-        wchar_t wallpaperPath[MAX_PATH] = { 0 };
-        HKEY hKey;
-        if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Control Panel\\Desktop", 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
-            DWORD size = sizeof(wallpaperPath);
-            RegQueryValueExW(hKey, L"Wallpaper", NULL, NULL, (LPBYTE)wallpaperPath, &size);
-            RegCloseKey(hKey);
-        }
-
-        if (wcslen(wallpaperPath) > 0) {
-            SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, (PVOID)wallpaperPath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
-        }
-
-        SendMessage(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 0);
-
-        WorkerW = NULL;
-	}
+    WorkerW = NULL;
+    // I hate this, but it is working
+    // straight up kill explorer to restore wallpaper, and no, I do not care for your tabs
+    system("taskkill /f /im explorer.exe >nul 2>&1");
+    system("start explorer.exe");
 }
 
 HWND WallpaperGetter::GetHandle() 

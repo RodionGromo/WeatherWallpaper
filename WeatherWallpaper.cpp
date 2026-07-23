@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include "WallpaperGetter.h"
+#include <csignal>
 
 
 #define WINDOW_WIDTH 1920
@@ -13,11 +14,71 @@ typedef struct AppState {
 	SDL_Renderer* renderer;
 	SDL_Window* window;
 	WallpaperGetter* wallpaper;
-} AppState;
+} AppState
+;
+void* global_appstate;
 
 static AppState* GetAppState(void* appstate) {
 	return (AppState*)appstate;
 }
+
+BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
+	switch (dwCtrlType) {
+	case CTRL_C_EVENT:
+	case CTRL_BREAK_EVENT:
+	case CTRL_CLOSE_EVENT:
+	case CTRL_LOGOFF_EVENT:
+	case CTRL_SHUTDOWN_EVENT:
+		if (global_appstate) {
+			AppState* state = GetAppState(global_appstate);
+			if (state->renderer) {
+				SDL_DestroyRenderer(state->renderer);
+				state->renderer = NULL;
+			}
+			if (state->window) {
+				SDL_DestroyWindow(state->window);
+				state->window = NULL;
+			}
+			if (state->wallpaper) {
+				state->wallpaper->ReturnHandle();
+				delete state->wallpaper;
+			}
+			SDL_free(global_appstate);
+		}
+		SDL_Quit();
+		exit(0);
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
+void SignalHandler(int signal) {
+	switch (signal) {
+	case SIGINT:
+	case SIGTERM:
+	case SIGABRT:
+		if (global_appstate) {
+			AppState* state = GetAppState(global_appstate);
+			if (state->renderer) {
+				SDL_DestroyRenderer(state->renderer);
+				state->renderer = NULL;
+			}
+			if (state->window) {
+				SDL_DestroyWindow(state->window);
+				state->window = NULL;
+			}
+			if (state->wallpaper) {
+				state->wallpaper->ReturnHandle();
+				delete state->wallpaper;
+			}
+			SDL_free(global_appstate);
+		}
+		SDL_Quit();
+		exit(0);
+		break;
+	}
+}
+
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 	SDL_SetAppMetadata("Test render", "1.0", "com.thegrom.weatherwallpaper");
@@ -55,6 +116,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 		delete wpg;
 		return SDL_APP_FAILURE;
 	}
+	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	// save data to appstate
 	AppState* state = (AppState*)SDL_malloc(sizeof(AppState));
@@ -62,8 +124,14 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char *argv[]) {
 	state->wallpaper = wpg;
 	state->window = wallpaper_window;
 	*appstate = state;
+	global_appstate = state;
 
-	SDL_SetRenderLogicalPresentation(renderer, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	// sanity protection (from force-closes)
+	SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
+	signal(SIGINT, SignalHandler);
+	signal(SIGTERM, SignalHandler);
+	signal(SIGABRT, SignalHandler);
+	
 	return SDL_APP_CONTINUE;
 }
 

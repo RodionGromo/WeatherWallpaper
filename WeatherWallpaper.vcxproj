@@ -144,7 +144,11 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="WallpaperGetter.cpp" />
     <ClCompile Include="WeatherWallpaper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WallpaperGetter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

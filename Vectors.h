@@ -2,11 +2,17 @@
 
 #include <SDL3/SDL_rect.h>
 
-#undef RGB;
+#undef RGB
 
-static class Vectors
+/// <summary>
+/// Helper class to store all vector classes
+/// </summary>
+class Vectors
 {
 public:
+	/// <summary>
+	/// Simple storage for two integers x and y
+	/// </summary>
 	class Vector2 {
 	private:
 		int x;
@@ -21,6 +27,9 @@ public:
 		}
 	};
 
+	/// <summary>
+	/// Simple storage for three integers x, y and z
+	/// </summary>
 	class Vector3 {
 	private:
 		int x;
@@ -37,6 +46,9 @@ public:
 		}
 	};
 
+	/// <summary>
+	/// Subclass of Vector3, variables changed to R, G and B
+	/// </summary>
 	class RGB : public Vector3 {
 	public:
 		RGB(int r, int g, int b) { set(r,g,b); }
@@ -48,6 +60,9 @@ public:
 		}
 	};
 
+	/// <summary>
+	/// Rectangle describer: position and size
+	/// </summary>
 	class Rect {
 	private:
 		Vector2 position;

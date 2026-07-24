@@ -1,4 +1,5 @@
 ﻿#define SDL_MAIN_USE_CALLBACKS 1
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <csignal>
@@ -56,7 +57,7 @@ static void cleanup() {
 	}
 }
 
-BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
+static BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
 	switch (dwCtrlType) {
 	case CTRL_C_EVENT:
 	case CTRL_BREAK_EVENT:
@@ -71,7 +72,7 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
 		return FALSE;
 	}
 }
-void SignalHandler(int signal) {
+static void SignalHandler(int signal) {
 	switch (signal) {
 	case SIGINT:
 	case SIGTERM:

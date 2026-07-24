@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="WeatherWallpaper.vcxproj" />
+  <Project Path="WeatherWallpaper.vcxproj" Id="d024f2c5-9517-4acc-b487-96da059b46a3" />
 </Solution>

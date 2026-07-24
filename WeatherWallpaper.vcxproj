@@ -144,10 +144,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RenderEngine.cpp" />
+    <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="WallpaperGetter.cpp" />
     <ClCompile Include="WeatherWallpaper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RenderEngine.h" />
+    <ClInclude Include="Vectors.h" />
     <ClInclude Include="WallpaperGetter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
